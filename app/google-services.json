@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "376925294123",
+    "project_id": "driver-recognition-system",
+    "storage_bucket": "driver-recognition-system.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:376925294123:android:d1c2a32a80f153e249646e",
+        "android_client_info": {
+          "package_name": "com.example.driverrecognitionsystem"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAw74Q_aKmvQFcW2S2XiXcpHAB-y6ME-74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
