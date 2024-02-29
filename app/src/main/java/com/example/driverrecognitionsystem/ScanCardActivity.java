@@ -2,20 +2,29 @@ package com.example.driverrecognitionsystem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.view.View;
 import android.view.textclassifier.TextLinks;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.graphics.Bitmap;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,8 +37,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -41,9 +54,16 @@ public class ScanCardActivity extends AppCompatActivity {
 
     private final OkHttpClient okHttpClient = new OkHttpClient();
     private ImageView imageView;
-    private EditText convertedText;
+    private EditText convertedText, user;
+
+    private Button btnSelect;
     private Uri filePath;
     private final int PICK_IMAGE_REQUEST = 22;
+
+    private static final int REQUEST_CAMERA_PERMISSION = 100;
+    private static final int REQUEST_CAMERA_CAPTURE = 101;
+
+    private String capturedImagePath;
 
     // Firebase instance
     FirebaseStorage firebaseStorage;
@@ -55,14 +75,22 @@ public class ScanCardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scan_card);
 
         // Initialize views
-        Button btnSelect = findViewById(R.id.btnChoose);
+        btnSelect = findViewById(R.id.btnChoose);
         Button btnUpload = findViewById(R.id.btnUpload);
         convertedText = findViewById(R.id.convertedText);
         imageView = findViewById(R.id.imageView);
+        user = findViewById(R.id.user);
 
         // Set the Firebase reference
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
+
+        convertedText.setVisibility(View.GONE);
+
+        String username = getIntent().getStringExtra("user");
+
+        user.setText(username);
+        user.setVisibility(View.GONE);
 
         // Select btn on press
         btnSelect.setOnClickListener(v -> selectImage());
@@ -72,10 +100,55 @@ public class ScanCardActivity extends AppCompatActivity {
     }
 
     private void selectImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select the image from here..."), PICK_IMAGE_REQUEST);
+        final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ScanCardActivity.this);
+        builder.setTitle("Select Source");
+        builder.setItems(options, (dialog, item) -> {
+            if (options[item].equals("Take Photo")) {
+                openCamera();
+            } else if (options[item].equals("Choose from Gallery")) {
+                openGallery();
+            } else if (options[item].equals("Cancel")) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    private void openGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(galleryIntent, PICK_IMAGE_REQUEST);
+    }
+
+    private void openCamera() {
+        Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if (captureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = createImageFile();
+
+            if (photoFile != null) {
+                capturedImagePath = photoFile.getAbsolutePath();
+                Uri photoUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", photoFile);
+                captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                startActivityForResult(captureIntent, REQUEST_CAMERA_CAPTURE);
+            }
+        } else {
+            Toast.makeText(this, "No camera app found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private File createImageFile() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File imageFile = null;
+        try {
+            imageFile = File.createTempFile(imageFileName, ".jpg", storageDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return imageFile;
     }
 
     private void uploadImage() {
@@ -137,9 +210,30 @@ public class ScanCardActivity extends AppCompatActivity {
             String res = response.body().string();
             JSONObject obj = new JSONObject(res);
             JSONArray jsonArray = obj.getJSONArray("ParsedResults");
+            StringBuilder extractedText = new StringBuilder();
+
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                convertedText.setText(jsonObject.getString("ParsedText"));
+                extractedText.append(jsonObject.getString("ParsedText")).append("\n");
+            }
+
+            // Send the extracted text to a new activity
+            Intent intent = new Intent(ScanCardActivity.this, QRActivity.class);
+            intent.putExtra("EXTRACTED_TEXT", extractedText.toString());
+            intent.putExtra("user", user.getText().toString());
+            startActivity(intent);
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, open the camera
+                openCamera();
+            } else {
+                // Permission denied
+                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -148,13 +242,22 @@ public class ScanCardActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            filePath = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK) {
+            if (data != null) {
+                filePath = data.getData();
+                // Load the selected image into the ImageView
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+                    imageView.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (requestCode == REQUEST_CAMERA_CAPTURE && resultCode == RESULT_OK) {
+            // Load the captured image into the ImageView
+            if (capturedImagePath != null) {
+                Bitmap bitmap = BitmapFactory.decodeFile(capturedImagePath);
                 imageView.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
         }
     }

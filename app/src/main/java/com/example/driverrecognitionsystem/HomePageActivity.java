@@ -45,6 +45,7 @@ public class HomePageActivity extends AppCompatActivity {
 
         scanBtn.setOnClickListener(v -> {
             Intent intent = new Intent(HomePageActivity.this, ScanCardActivity.class);
+            intent.putExtra("user", userName);
             startActivity(intent);
         });
     }

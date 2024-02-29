@@ -19,34 +19,50 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/btn_custom"
+        android:fontFamily="@font/roboto_regular"
         android:text="Choose" />
 
     <Button
         android:id="@+id/btnUpload"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/btn_custom"
+        android:fontFamily="@font/roboto_regular"
         android:layout_weight="1"
-        android:text="Upload" />
+        android:text="Detect Text" />
 
   </LinearLayout>
 
   <ImageView
       android:id="@+id/imageView"
-      android:layout_width="256dp"
-      android:layout_height="256dp"
+      android:layout_width="332dp"
+      android:layout_height="300dp"
       android:layout_below="@id/layout_button"
-      android:layout_centerHorizontal="true"
-      android:layout_marginTop="16dp"
+      android:layout_alignParentStart="true"
+      android:layout_alignParentEnd="true"
+      android:layout_marginStart="40dp"
+      android:layout_marginTop="65dp"
+      android:layout_marginEnd="39dp"
       android:src="@drawable/ic_launcher_foreground" />
 
   <EditText
       android:id="@+id/convertedText"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
+      android:layout_height="197dp"
       android:layout_below="@id/imageView"
-      android:layout_centerHorizontal="true"
-      android:layout_marginTop="16dp"
-      android:padding="16dp"
-      android:hint="Converted Text" />
+      android:layout_marginTop="39dp"
+      android:hint="Converted Text"
+      android:padding="16dp" />
+
+  <EditText
+      android:id="@+id/user"
+      android:layout_width="238dp"
+      android:layout_height="40dp"
+      android:layout_below="@id/imageView"
+      android:layout_marginTop="237dp"
+      android:hint=""
+      android:padding="16dp" />
 
 </RelativeLayout>
