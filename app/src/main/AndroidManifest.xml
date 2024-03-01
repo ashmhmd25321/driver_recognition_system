@@ -18,7 +18,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".QRActivity"
+            android:name=".QRGeneretor"
+            android:exported="false" />
+        <activity
+            android:name=".ViewLicenceDetails"
+            android:exported="false" />
+        <activity
+            android:name=".ConfirmDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".HomePageActivity"

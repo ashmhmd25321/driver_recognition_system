@@ -77,6 +77,7 @@ public class LoginFragment extends Fragment {
                             // Navigate to the HomePageActivity
                             Intent intent = new Intent(getActivity(), HomePageActivity.class);
                             intent.putExtra("userName", userName);
+                            intent.putExtra("userEmail", email);
                             startActivity(intent);
                             getActivity().finish();
                         } else {
