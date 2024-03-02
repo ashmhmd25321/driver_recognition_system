@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -46,6 +47,7 @@ public class ViewLicenceDetails extends AppCompatActivity {
         licenceDetails = findViewById(R.id.textView3);
         username = findViewById(R.id.textView4);
         vehicles = findViewById(R.id.textView5);
+        vehicles.setVisibility(View.GONE);
 
         qrBtn = findViewById(R.id.button3);
         updateBtn = findViewById(R.id.button4);
@@ -60,15 +62,17 @@ public class ViewLicenceDetails extends AppCompatActivity {
 
         loadProfileImage(userName);
 
+
+
         updateBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(ViewLicenceDetails.this, ScanCardActivity.class);
+            Intent intent = new Intent(ViewLicenceDetails.this, ScanCardFrontActivity.class);
             intent.putExtra("user", userName);
             startActivity(intent);
         });
 
         qrBtn.setOnClickListener(v -> {
             Intent intent = new Intent(ViewLicenceDetails.this, QRGeneretor.class);
-            intent.putExtra("user", userName);
+            intent.putExtra("qr", licenceDetails.getText().toString());
             startActivity(intent);
         });
 
@@ -81,9 +85,9 @@ public class ViewLicenceDetails extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     DriverLicence driverLicence = dataSnapshot.getValue(DriverLicence.class);
                     if (driverLicence != null) {
-                        // Update the UI with the retrieved details
-                        licenceDetails.setText(driverLicence.getText());
-                        vehicles.setText(driverLicence.getVehicles());
+
+                        String details = driverLicence.getText() + driverLicence.getVehicles();
+                        licenceDetails.setText(details);
                     }
                 }
             }

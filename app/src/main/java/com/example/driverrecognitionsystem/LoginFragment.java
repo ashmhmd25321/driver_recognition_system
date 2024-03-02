@@ -19,6 +19,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,34 +63,40 @@ public class LoginFragment extends Fragment {
     }
 
     private void loginUser() {
-        String email = etEmail.getText().toString().trim();
+        String emailOrDisplayName = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+        if (TextUtils.isEmpty(emailOrDisplayName) || TextUtils.isEmpty(password)) {
             // Handle empty fields
             Toast.makeText(getActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Authenticate user with Firebase Authentication
-        firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            String userName = getUserDisplayName();
-                            // Navigate to the HomePageActivity
-                            Intent intent = new Intent(getActivity(), HomePageActivity.class);
-                            intent.putExtra("userName", userName);
-                            intent.putExtra("userEmail", email);
-                            startActivity(intent);
-                            getActivity().finish();
-                        } else {
-                            String errorMessage = "Login failed. Please check your credentials and try again.";
-                            Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_SHORT).show();
+        // Check if the input is an email
+        if (android.util.Patterns.EMAIL_ADDRESS.matcher(emailOrDisplayName).matches()) {
+            // Input is an email, sign in with email
+            firebaseAuth.signInWithEmailAndPassword(emailOrDisplayName, password)
+                    .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Retrieve user display name after signing in
+                                String userName = getUserDisplayName();
+                                // Navigate to the HomePageActivity
+                                Intent intent = new Intent(getActivity(), HomePageActivity.class);
+                                intent.putExtra("userName", userName);
+                                intent.putExtra("userEmail", emailOrDisplayName);
+                                startActivity(intent);
+                                getActivity().finish();
+                            } else {
+                                String errorMessage = "Login failed. Please check your credentials and try again.";
+                                Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                });
+                    });
+        } else {
+            checkDisplayNameAndPassword(emailOrDisplayName, password);
+        }
     }
 
     private String getUserDisplayName() {
@@ -103,5 +114,43 @@ public class LoginFragment extends Fragment {
             return "Guest";
         }
     }
+
+    private void checkDisplayNameAndPassword(String displayName, String password) {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Users");
+
+        usersRef.orderByChild("displayName").equalTo(displayName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // User with provided display name found
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        User user = userSnapshot.getValue(User.class);
+
+                        if (user != null && user.getPassword().equals(password)) {
+                            // Passwords match, login successful
+                            // Navigate to the HomePageActivity
+                            Intent intent = new Intent(getActivity(), HomePageActivity.class);
+                            intent.putExtra("userName", displayName);
+                            startActivity(intent);
+                            getActivity().finish();
+                        } else {
+                            // Passwords do not match
+                            Toast.makeText(getActivity(), "Incorrect password", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } else {
+                    // User with provided display name not found
+                    Toast.makeText(getActivity(), "User not found", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle database error
+                Toast.makeText(getActivity(), "Database error", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
 }

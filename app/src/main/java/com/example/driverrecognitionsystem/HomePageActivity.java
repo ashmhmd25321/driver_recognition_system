@@ -1,15 +1,11 @@
 package com.example.driverrecognitionsystem;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -22,14 +18,9 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 public class HomePageActivity extends AppCompatActivity {
 
@@ -80,7 +71,7 @@ public class HomePageActivity extends AppCompatActivity {
         });
 
         scanBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(HomePageActivity.this, ScanCardActivity.class);
+            Intent intent = new Intent(HomePageActivity.this, ScanCardFrontActivity.class);
             intent.putExtra("user", userName);
             startActivity(intent);
         });

@@ -18,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ScanCardBackActivity"
+            android:exported="false" />
+        <activity
             android:name=".QRGeneretor"
             android:exported="false" />
         <activity
@@ -30,7 +33,7 @@
             android:name=".HomePageActivity"
             android:exported="false" />
         <activity
-            android:name=".ScanCardActivity"
+            android:name=".ScanCardFrontActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

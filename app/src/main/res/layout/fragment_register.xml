@@ -29,30 +29,51 @@
         android:layout_marginStart="25dp"
         android:layout_marginBottom="50dp"/>
 
+    <RadioGroup
+        android:id="@+id/radioGroupUserType"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp"
+        android:padding="15dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioUser"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Driver"
+            android:fontFamily="@font/roboto_regular"/>
+
+        <RadioButton
+            android:id="@+id/radioPolice"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Police"
+            android:fontFamily="@font/roboto_regular"/>
+
+        <RadioButton
+            android:id="@+id/radioPostOffice"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Post Office"
+            android:fontFamily="@font/roboto_regular"/>
+    </RadioGroup>
+
     <EditText
         android:id="@+id/et_name"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="User Name"
+        android:hint="ID"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="10dp"
         android:padding="15dp"
         android:inputType="textPersonName"
-        android:fontFamily="@font/roboto_regular"
-        android:background="@drawable/et_custom"
-        android:textSize="15sp" />
-
-    <EditText
-        android:id="@+id/address"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:hint="Address"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="10dp"
-        android:padding="15dp"
-        android:inputType="text"
         android:fontFamily="@font/roboto_regular"
         android:background="@drawable/et_custom"
         android:textSize="15sp" />

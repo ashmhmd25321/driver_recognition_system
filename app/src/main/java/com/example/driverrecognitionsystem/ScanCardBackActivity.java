@@ -39,11 +39,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class ScanCardActivity extends AppCompatActivity {
+public class ScanCardBackActivity extends AppCompatActivity {
 
     private final OkHttpClient okHttpClient = new OkHttpClient();
     private ImageView imageView;
-    private EditText convertedText, user;
+    private EditText convertedText, user, previousText;
 
     private Button btnSelect;
     private Uri filePath;
@@ -61,7 +61,7 @@ public class ScanCardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan_card);
+        setContentView(R.layout.activity_scan_card_back);
 
         // Initialize views
         btnSelect = findViewById(R.id.btnChoose);
@@ -69,6 +69,7 @@ public class ScanCardActivity extends AppCompatActivity {
         convertedText = findViewById(R.id.convertedText);
         imageView = findViewById(R.id.imageView);
         user = findViewById(R.id.user);
+        previousText = findViewById(R.id.previousText);
 
         // Set the Firebase reference
         firebaseStorage = FirebaseStorage.getInstance();
@@ -77,9 +78,12 @@ public class ScanCardActivity extends AppCompatActivity {
         convertedText.setVisibility(View.GONE);
 
         String username = getIntent().getStringExtra("user");
+        String previous = getIntent().getStringExtra("EXTRACTED_TEXT");
 
         user.setText(username);
+        previousText.setText(previous);
         user.setVisibility(View.GONE);
+        previousText.setVisibility(View.GONE);
 
         // Select btn on press
         btnSelect.setOnClickListener(v -> selectImage());
@@ -91,7 +95,7 @@ public class ScanCardActivity extends AppCompatActivity {
     private void selectImage() {
         final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(ScanCardActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ScanCardBackActivity.this);
         builder.setTitle("Select Source");
         builder.setItems(options, (dialog, item) -> {
             if (options[item].equals("Take Photo")) {
@@ -151,12 +155,12 @@ public class ScanCardActivity extends AppCompatActivity {
             // Listener on upload
             ref.putFile(filePath).addOnSuccessListener(taskSnapshot -> {
                 progressDialog.dismiss();
-                Toast.makeText(ScanCardActivity.this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ScanCardBackActivity.this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
 
                 // Points to the root reference
                 StorageReference dataRef = storageReference.child("images/image");
                 dataRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                    Toast.makeText(ScanCardActivity.this, uri.toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ScanCardBackActivity.this, uri.toString(), Toast.LENGTH_SHORT).show();
 
                     // Use AsyncTask or another background threading mechanism instead of StrictMode
                     new Thread(() -> {
@@ -169,7 +173,7 @@ public class ScanCardActivity extends AppCompatActivity {
                 });
             }).addOnFailureListener(e -> {
                 progressDialog.dismiss();
-                Toast.makeText(ScanCardActivity.this, "Failed!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ScanCardBackActivity.this, "Failed!!", Toast.LENGTH_SHORT).show();
             }).addOnProgressListener(snapshot -> {
                 double progress = (100.0 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
                 progressDialog.setMessage("Uploaded" + (int) progress + "%");
@@ -207,8 +211,9 @@ public class ScanCardActivity extends AppCompatActivity {
             }
 
             // Send the extracted text to a new activity
-            Intent intent = new Intent(ScanCardActivity.this, ConfirmDetailsActivity.class);
-            intent.putExtra("EXTRACTED_TEXT", extractedText.toString());
+            Intent intent = new Intent(ScanCardBackActivity.this, ConfirmDetailsActivity.class);
+            intent.putExtra("EXTRACTED_TEXT_BACK", extractedText.toString());
+            intent.putExtra("EXTRACTED_TEXT_FRONT", previousText.getText().toString());
             intent.putExtra("user", user.getText().toString());
             startActivity(intent);
         }

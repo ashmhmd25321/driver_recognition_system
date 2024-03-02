@@ -55,7 +55,8 @@ public class ConfirmDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirm_details);
 
-        String extractedText = getIntent().getStringExtra("EXTRACTED_TEXT");
+        String extractedTextFront = getIntent().getStringExtra("EXTRACTED_TEXT_FRONT");
+        String extractedTextBack = getIntent().getStringExtra("EXTRACTED_TEXT_BACK");
         String username = getIntent().getStringExtra("user");
 
         firebaseStorage = FirebaseStorage.getInstance();
@@ -70,7 +71,8 @@ public class ConfirmDetailsActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         vehicles = findViewById(R.id.textView2);
 
-        extractedTextView.setText(extractedText);
+        extractedTextView.setText(extractedTextFront);
+        vehicles.setText(extractedTextBack);
         user.setText(username);
         user.setVisibility(View.GONE);
 
