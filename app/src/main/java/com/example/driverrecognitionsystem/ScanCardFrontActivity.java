@@ -20,6 +20,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -58,6 +60,8 @@ public class ScanCardFrontActivity extends AppCompatActivity {
     FirebaseStorage firebaseStorage;
     StorageReference storageReference;
 
+    private DatabaseReference databaseReference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +81,8 @@ public class ScanCardFrontActivity extends AppCompatActivity {
         convertedText.setVisibility(View.GONE);
 
         String username = getIntent().getStringExtra("user");
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("Images");
 
         user.setText(username);
         user.setVisibility(View.GONE);
@@ -146,7 +152,7 @@ public class ScanCardFrontActivity extends AppCompatActivity {
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            StorageReference ref = storageReference.child("images/image");
+            StorageReference ref = storageReference.child("images/imageFront/" + user.getText().toString());
 
             // Listener on upload
             ref.putFile(filePath).addOnSuccessListener(taskSnapshot -> {
@@ -154,9 +160,12 @@ public class ScanCardFrontActivity extends AppCompatActivity {
                 Toast.makeText(ScanCardFrontActivity.this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
 
                 // Points to the root reference
-                StorageReference dataRef = storageReference.child("images/image");
+                StorageReference dataRef = storageReference.child("images/imageFront/" + user.getText().toString());
                 dataRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     Toast.makeText(ScanCardFrontActivity.this, uri.toString(), Toast.LENGTH_SHORT).show();
+
+                    // Save image info to Firebase Database for both ImageViews
+                    saveImageInfoToDatabase(uri.toString(), user.getText().toString(), "FrontImage");
 
                     // Use AsyncTask or another background threading mechanism instead of StrictMode
                     new Thread(() -> {
@@ -206,11 +215,41 @@ public class ScanCardFrontActivity extends AppCompatActivity {
                 extractedText.append(jsonObject.getString("ParsedText")).append("\n");
             }
 
+            byte[] imageData = getImageData(imageUrl);
+
             // Send the extracted text to a new activity
             Intent intent = new Intent(ScanCardFrontActivity.this, ScanCardBackActivity.class);
             intent.putExtra("EXTRACTED_TEXT", extractedText.toString());
             intent.putExtra("user", user.getText().toString());
+            intent.putExtra("IMAGE_DATA", imageData);
             startActivity(intent);
+        }
+    }
+
+    private void saveImageInfoToDatabase(String imageUrl, String username, String imageType) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("FrontImage");
+
+        FrontImageInfo imageInfo = new FrontImageInfo(imageUrl, username, imageType);
+
+        databaseReference.child(username).setValue(imageInfo)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(ScanCardFrontActivity.this, "Image Info Saved", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ScanCardFrontActivity.this, "Failed to Save Image Info", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private byte[] getImageData(String imageUrl) throws IOException {
+        Request imageRequest = new Request.Builder()
+                .url(imageUrl)
+                .build();
+
+        try (Response imageResponse = okHttpClient.newCall(imageRequest).execute()) {
+            if (!imageResponse.isSuccessful()) throw new IOException("Unexpected Error" + imageResponse);
+
+            return imageResponse.body().bytes();
         }
     }
 

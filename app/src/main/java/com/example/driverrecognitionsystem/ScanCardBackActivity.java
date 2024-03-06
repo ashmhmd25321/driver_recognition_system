@@ -20,6 +20,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -42,7 +44,7 @@ import okhttp3.Response;
 public class ScanCardBackActivity extends AppCompatActivity {
 
     private final OkHttpClient okHttpClient = new OkHttpClient();
-    private ImageView imageView;
+    private ImageView imageView, imageFront;
     private EditText convertedText, user, previousText;
 
     private Button btnSelect;
@@ -58,6 +60,8 @@ public class ScanCardBackActivity extends AppCompatActivity {
     FirebaseStorage firebaseStorage;
     StorageReference storageReference;
 
+    private DatabaseReference databaseReference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +74,7 @@ public class ScanCardBackActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         user = findViewById(R.id.user);
         previousText = findViewById(R.id.previousText);
+        imageFront = findViewById(R.id.imageFront);
 
         // Set the Firebase reference
         firebaseStorage = FirebaseStorage.getInstance();
@@ -77,8 +82,15 @@ public class ScanCardBackActivity extends AppCompatActivity {
 
         convertedText.setVisibility(View.GONE);
 
+        databaseReference = FirebaseDatabase.getInstance().getReference("Images");
+
         String username = getIntent().getStringExtra("user");
         String previous = getIntent().getStringExtra("EXTRACTED_TEXT");
+        byte[] imageData = getIntent().getByteArrayExtra("IMAGE_DATA");
+
+        Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+
+        imageFront.setImageBitmap(bitmap);
 
         user.setText(username);
         previousText.setText(previous);
@@ -150,7 +162,7 @@ public class ScanCardBackActivity extends AppCompatActivity {
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            StorageReference ref = storageReference.child("images/image");
+            StorageReference ref = storageReference.child("images/imageBack/" + user.getText().toString());
 
             // Listener on upload
             ref.putFile(filePath).addOnSuccessListener(taskSnapshot -> {
@@ -158,9 +170,12 @@ public class ScanCardBackActivity extends AppCompatActivity {
                 Toast.makeText(ScanCardBackActivity.this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
 
                 // Points to the root reference
-                StorageReference dataRef = storageReference.child("images/image");
+                StorageReference dataRef = storageReference.child("images/imageBack/" + user.getText().toString());
                 dataRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     Toast.makeText(ScanCardBackActivity.this, uri.toString(), Toast.LENGTH_SHORT).show();
+
+                    // Save image info to Firebase Database for both ImageViews
+                    saveImageInfoToDatabase(uri.toString(), user.getText().toString(), "BackImage");
 
                     // Use AsyncTask or another background threading mechanism instead of StrictMode
                     new Thread(() -> {
@@ -217,6 +232,21 @@ public class ScanCardBackActivity extends AppCompatActivity {
             intent.putExtra("user", user.getText().toString());
             startActivity(intent);
         }
+    }
+
+    private void saveImageInfoToDatabase(String imageUrl, String username, String imageType) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("BackImage");
+
+        BackImageInfo imageInfo = new BackImageInfo(imageUrl, username, imageType);
+
+        databaseReference.child(username).setValue(imageInfo)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(ScanCardBackActivity.this, "Image Info Saved", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ScanCardBackActivity.this, "Failed to Save Image Info", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

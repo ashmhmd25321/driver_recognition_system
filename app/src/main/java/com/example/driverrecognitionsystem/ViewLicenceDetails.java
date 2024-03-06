@@ -30,7 +30,7 @@ import com.google.firebase.storage.StorageReference;
 public class ViewLicenceDetails extends AppCompatActivity {
 
     TextView licenceDetails, username, vehicles;
-    Button qrBtn, updateBtn;
+    Button qrBtn, updateBtn, viewImages;
     ImageView profileImage;
 
     FirebaseAuth firebaseAuth;
@@ -51,6 +51,7 @@ public class ViewLicenceDetails extends AppCompatActivity {
 
         qrBtn = findViewById(R.id.button3);
         updateBtn = findViewById(R.id.button4);
+        viewImages = findViewById(R.id.button5);
 
         profileImage = findViewById(R.id.imageView2);
 
@@ -62,7 +63,11 @@ public class ViewLicenceDetails extends AppCompatActivity {
 
         loadProfileImage(userName);
 
-
+        viewImages.setOnClickListener(v -> {
+            Intent intent = new Intent(ViewLicenceDetails.this, ViewLicenceImages.class);
+            intent.putExtra("user", userName);
+            startActivity(intent);
+        });
 
         updateBtn.setOnClickListener(v -> {
             Intent intent = new Intent(ViewLicenceDetails.this, ScanCardFrontActivity.class);
@@ -72,7 +77,7 @@ public class ViewLicenceDetails extends AppCompatActivity {
 
         qrBtn.setOnClickListener(v -> {
             Intent intent = new Intent(ViewLicenceDetails.this, QRGeneretor.class);
-            intent.putExtra("qr", licenceDetails.getText().toString());
+            intent.putExtra("qr", userName);
             startActivity(intent);
         });
 

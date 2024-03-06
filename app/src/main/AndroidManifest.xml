@@ -18,6 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".PoliceHomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ViewLicenceImages"
+            android:exported="false" />
+        <activity
             android:name=".ScanCardBackActivity"
             android:exported="false" />
         <activity

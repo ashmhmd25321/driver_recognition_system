@@ -61,6 +61,8 @@
         android:id="@+id/previousText"
         android:layout_width="37dp"
         android:layout_height="31dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="374dp"
         android:hint="Converted Text"
         android:padding="16dp" />
 
@@ -86,5 +88,14 @@
         android:textColor="@color/red"
         android:text="Please choose a back image of the driving license"
         android:textSize="14sp" />
+
+    <ImageView
+        android:id="@+id/imageFront"
+        android:layout_width="181dp"
+        android:layout_height="181dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="118dp"
+        android:layout_marginBottom="60dp" />
 
 </RelativeLayout>
