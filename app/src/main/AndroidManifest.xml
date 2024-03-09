@@ -18,6 +18,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ViewDriverActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PoliceUpdateDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PoliceProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".PoliceHomeActivity"
             android:exported="false" />
         <activity

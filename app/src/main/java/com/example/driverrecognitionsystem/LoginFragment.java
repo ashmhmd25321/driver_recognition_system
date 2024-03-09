@@ -82,12 +82,14 @@ public class LoginFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 // Retrieve user display name after signing in
                                 String userName = getUserDisplayName();
-                                // Navigate to the HomePageActivity
-                                Intent intent = new Intent(getActivity(), HomePageActivity.class);
-                                intent.putExtra("userName", userName);
-                                intent.putExtra("userEmail", emailOrDisplayName);
-                                startActivity(intent);
-                                getActivity().finish();
+
+                                checkUserRoleAndNavigate(userName);
+//                                // Navigate to the HomePageActivity
+//                                Intent intent = new Intent(getActivity(), HomePageActivity.class);
+//                                intent.putExtra("userName", userName);
+//                                intent.putExtra("userEmail", emailOrDisplayName);
+//                                startActivity(intent);
+//                                getActivity().finish();
                             } else {
                                 String errorMessage = "Login failed. Please check your credentials and try again.";
                                 Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_SHORT).show();
@@ -97,6 +99,66 @@ public class LoginFragment extends Fragment {
         } else {
             checkDisplayNameAndPassword(emailOrDisplayName, password);
         }
+    }
+
+    private void checkUserRoleAndNavigate(String userName) {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Users");
+
+        usersRef.orderByChild("displayName").equalTo(userName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        User user = userSnapshot.getValue(User.class);
+
+                        if (user != null) {
+                            String userType = user.getUserType();
+
+                            // Check user role and navigate accordingly
+                            switch (userType) {
+                                case "Driver":
+                                    navigateToDriverActivity(userName);
+                                    break;
+                                case "Police":
+                                    navigateToPoliceActivity(userName);
+                                    break;
+                                case "Post Office":
+//                                    navigateToPostOfficeActivity(userName);
+                                    break;
+                                default:
+                                    // Unknown role
+                                    Toast.makeText(getActivity(), "Unknown user role", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                } else {
+                    // User not found
+                    Toast.makeText(getActivity(), "User not found", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle database error
+                Toast.makeText(getActivity(), "Database error", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void navigateToDriverActivity(String userName) {
+        // Redirect to the DriverActivity
+        Intent intent = new Intent(getActivity(), HomePageActivity.class);
+        intent.putExtra("userName", userName);
+        startActivity(intent);
+        getActivity().finish();
+    }
+
+    private void navigateToPoliceActivity(String userName) {
+        // Redirect to the PoliceActivity
+        Intent intent = new Intent(getActivity(), PoliceHomeActivity.class);
+        intent.putExtra("userName", userName);
+        startActivity(intent);
+        getActivity().finish();
     }
 
     private String getUserDisplayName() {
@@ -128,11 +190,12 @@ public class LoginFragment extends Fragment {
 
                         if (user != null && user.getPassword().equals(password)) {
                             // Passwords match, login successful
+                            checkUserRoleAndNavigate(displayName);
                             // Navigate to the HomePageActivity
-                            Intent intent = new Intent(getActivity(), HomePageActivity.class);
-                            intent.putExtra("userName", displayName);
-                            startActivity(intent);
-                            getActivity().finish();
+//                            Intent intent = new Intent(getActivity(), HomePageActivity.class);
+//                            intent.putExtra("userName", displayName);
+//                            startActivity(intent);
+//                            getActivity().finish();
                         } else {
                             // Passwords do not match
                             Toast.makeText(getActivity(), "Incorrect password", Toast.LENGTH_SHORT).show();

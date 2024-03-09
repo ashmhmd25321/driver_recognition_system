@@ -48,7 +48,7 @@ public class HomePageActivity extends AppCompatActivity {
         String userName = getIntent().getStringExtra("userName");
         String email = getIntent().getStringExtra("userEmail");
 
-        welcome.setText("Hi " + userName + " Welcome to the System");
+        welcome.setText(userName);
 
         loadProfileImage(userName);
 
