@@ -67,6 +67,12 @@ public class PoliceHomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        driverProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(PoliceHomeActivity.this, ViewDriverActivity.class);
+            intent.putExtra("user", userName);
+            startActivity(intent);
+        });
+
     }
 
     private void loadProfileImage(String username) {
