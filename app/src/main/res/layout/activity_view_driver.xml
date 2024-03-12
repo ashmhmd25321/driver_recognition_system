@@ -14,12 +14,40 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="109dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="97dp"
+        android:layout_marginStart="106dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="100dp"
         android:background="@drawable/btn_custom"
         android:fontFamily="@font/roboto_regular"
         android:text="QR Scanner" />
+
+    <Button
+        android:id="@+id/faceRecognition"
+        android:layout_width="127dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/licenceDetails"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="63dp"
+        android:layout_marginEnd="243dp"
+        android:background="@drawable/btn_custom"
+        android:fontFamily="@font/roboto_regular"
+        android:text="Recognize Face" />
+
+    <Button
+        android:id="@+id/addFine"
+        android:layout_width="127dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/licenceDetails"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="224dp"
+        android:layout_marginTop="65dp"
+        android:layout_marginEnd="42dp"
+        android:background="@drawable/btn_custom"
+        android:fontFamily="@font/roboto_regular"
+        android:text="Add Fine" />
 
     <Button
         android:id="@+id/search"
@@ -43,20 +71,20 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="3dp"
-        android:layout_marginTop="29dp"
+        android:layout_marginTop="21dp"
         android:layout_marginEnd="0dp"
         android:textSize="30dp" />
 
     <TextView
         android:id="@+id/licenceDetails"
-        android:layout_width="391dp"
-        android:layout_height="358dp"
+        android:layout_width="392dp"
+        android:layout_height="310dp"
         android:layout_below="@+id/search"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="42dp"
-        android:textSize="25dp"
-        android:layout_marginEnd="0dp" />
+        android:layout_marginStart="-1dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="1dp"
+        android:textSize="25dp" />
 
 </RelativeLayout>

@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,7 +27,7 @@ import javax.annotation.Nullable;
 
 public class ViewDriverActivity extends AppCompatActivity {
 
-    Button scanner, search;
+    Button scanner, search, faceRecognition;
     EditText text;
 
     TextView driverDetails, username;
@@ -44,6 +47,7 @@ public class ViewDriverActivity extends AppCompatActivity {
         text = findViewById(R.id.driverId);
         search = findViewById(R.id.search);
         driverDetails = findViewById(R.id.licenceDetails);
+        faceRecognition = findViewById(R.id.faceRecognition);
 
         String userName = getIntent().getStringExtra("user");
 
@@ -57,6 +61,13 @@ public class ViewDriverActivity extends AppCompatActivity {
             intentIntegrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
             intentIntegrator.initiateScan();
         });
+
+        faceRecognition.setOnClickListener(v -> {
+            Intent intent = new Intent(ViewDriverActivity.this, FaceRecognitionActivity.class);
+            intent.putExtra("driver", text.getText().toString());
+            startActivity(intent);
+        });
+
 
         search.setOnClickListener(v -> {
 

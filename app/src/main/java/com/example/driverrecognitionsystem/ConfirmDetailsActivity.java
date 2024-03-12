@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -21,13 +22,23 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.vision.face.FaceDetector;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.face.FirebaseVisionFace;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 
 public class ConfirmDetailsActivity extends AppCompatActivity {
@@ -36,6 +47,8 @@ public class ConfirmDetailsActivity extends AppCompatActivity {
     TextView user;
 
     private ImageView imageView;
+
+    private FirebaseVisionFaceDetector faceDetector;
 
     Button saveToDb, backToHome, chooseProfile;
 
@@ -76,6 +89,9 @@ public class ConfirmDetailsActivity extends AppCompatActivity {
         user.setText(username);
         user.setVisibility(View.GONE);
 
+        // Initialize face detector
+        faceDetector = createFaceDetector();
+
         chooseProfile.setOnClickListener(v -> {
             openGallery();
         });
@@ -88,6 +104,7 @@ public class ConfirmDetailsActivity extends AppCompatActivity {
 
                 if (!licenceDetails.isEmpty() && imageUri != null) {
                     uploadImageToStorage(username);
+                    detectFacesInImage(imageUri, username);
                     DriverLicence driverLicence = new DriverLicence(licenceDetails, username, imageUri.toString(), authorizedVehicles);
                     db = FirebaseDatabase.getInstance();
                     reference = db.getReference("Licence_Details");
@@ -117,6 +134,80 @@ public class ConfirmDetailsActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
+
+    // Function to create a face detector
+    private FirebaseVisionFaceDetector createFaceDetector() {
+        FirebaseVisionFaceDetectorOptions options =
+                new FirebaseVisionFaceDetectorOptions.Builder()
+                        .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+                        .enableTracking()
+                        .build();
+
+        return FirebaseVision.getInstance().getVisionFaceDetector(options);
+    }
+
+    private void detectFacesInImage(Uri imageUri, String username) {
+        FirebaseVisionImage firebaseVisionImage;
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+            firebaseVisionImage = FirebaseVisionImage.fromBitmap(bitmap);
+
+            faceDetector.detectInImage(firebaseVisionImage)
+                    .addOnSuccessListener(firebaseVisionFaces -> {
+                        if (firebaseVisionFaces.size() > 0) {
+                            FirebaseVisionFace firstFace = firebaseVisionFaces.get(0);
+                            Rect boundingBox = firstFace.getBoundingBox();
+                            Bitmap recognizedFaceBitmap = Bitmap.createBitmap(bitmap, boundingBox.left, boundingBox.top, boundingBox.width(), boundingBox.height());
+
+                            saveFaceInfoToDatabase(username, recognizedFaceBitmap);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        // Handle face detection failure
+                        Log.e("ConfirmDetailsActivity", "Error detecting face: " + e.getMessage());
+                        Toast.makeText(ConfirmDetailsActivity.this, "Error detecting face", Toast.LENGTH_SHORT).show();
+                    });
+        } catch (IOException e) {
+            Log.e("ConfirmDetailsActivity", "Error creating FirebaseVisionImage: " + e.getMessage());
+        }
+    }
+
+    private void saveFaceInfoToDatabase(String username, Bitmap recognizedFaceBitmap) {
+        DatabaseReference faceReference = db.getReference("Face_Details");
+
+        String faceKey = faceReference.child(username).push().getKey();
+
+        uploadFaceImageToStorage(username, recognizedFaceBitmap);
+    }
+
+    private void uploadFaceImageToStorage(String username, Bitmap recognizedFaceBitmap) {
+        if (recognizedFaceBitmap != null) {
+            // Create a Storage Reference for the face image
+            StorageReference storageRef = firebaseStorage.getReference().child("face_images/" + username + ".jpg");
+
+            // Convert the Bitmap to a byte array
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            recognizedFaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data = baos.toByteArray();
+
+            // Upload the face image to Firebase Storage
+            storageRef.putBytes(data)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            // Face image uploaded successfully
+                            // You can handle additional logic if needed
+                        } else {
+                            // Handle the error
+                            Log.e("ConfirmDetailsActivity", "Error uploading face image: " + task.getException());
+                            Toast.makeText(ConfirmDetailsActivity.this, "Error uploading face image", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
+
+
+
+
 
     private void openGallery() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
