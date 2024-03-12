@@ -123,7 +123,7 @@ public class LoginFragment extends Fragment {
                                     navigateToPoliceActivity(userName);
                                     break;
                                 case "Post Office":
-//                                    navigateToPostOfficeActivity(userName);
+                                    navigateToPostOfficeActivity(userName);
                                     break;
                                 default:
                                     // Unknown role
@@ -156,6 +156,14 @@ public class LoginFragment extends Fragment {
     private void navigateToPoliceActivity(String userName) {
         // Redirect to the PoliceActivity
         Intent intent = new Intent(getActivity(), PoliceHomeActivity.class);
+        intent.putExtra("userName", userName);
+        startActivity(intent);
+        getActivity().finish();
+    }
+
+    private void navigateToPostOfficeActivity(String userName) {
+        // Redirect to the PoliceActivity
+        Intent intent = new Intent(getActivity(), PostHomePage.class);
         intent.putExtra("userName", userName);
         startActivity(intent);
         getActivity().finish();

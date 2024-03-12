@@ -18,6 +18,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ViewFinesAccordingToDriverId"
+            android:exported="false" />
+        <activity
+            android:name=".PostHomePage"
+            android:exported="false" />
+        <activity
+            android:name=".ViewFinesActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddFineActivity"
             android:exported="false" />
         <activity

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textDriverUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Driver User: " />
+
+    <TextView
+        android:id="@+id/textAddedDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Added Date: " />
+
+    <TextView
+        android:id="@+id/textPoliceUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Police User: " />
+
+    <TextView
+        android:id="@+id/textReason"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reason: " />
+
+    <TextView
+        android:id="@+id/amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fine Amount (LKR): " />
+
+    <TextView
+        android:id="@+id/vehicle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vehicle Number: " />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status: " />
+
+    <Button
+        android:id="@+id/payment"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_custom"
+        android:fontFamily="@font/roboto_regular"
+        android:text="Pay Now" />
+
+</LinearLayout>

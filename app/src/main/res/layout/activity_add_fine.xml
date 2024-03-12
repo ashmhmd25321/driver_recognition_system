@@ -2,14 +2,22 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/targetId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Target ID"/>
 
     <TextView
         android:id="@+id/textViewDriverUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Driver User:"/>
+        android:hint="Driver User:"/>
+
 
     <EditText
         android:id="@+id/editTextDriverUser"
@@ -18,10 +26,22 @@
         android:hint="Enter driver user"/>
 
     <TextView
+        android:id="@+id/textViewVehicleNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Vehicle Number:"/>
+
+    <EditText
+        android:id="@+id/editTextVehicleNo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Vehicle Number"/>
+
+    <TextView
         android:id="@+id/textViewAddedDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Added Date:"/>
+        android:hint="Added Date:"/>
 
     <EditText
         android:id="@+id/editTextAddedDate"
@@ -33,7 +53,7 @@
         android:id="@+id/textViewPoliceUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Police User:"/>
+        android:hint="Police User:"/>
 
     <EditText
         android:id="@+id/editTextPoliceUser"
@@ -45,7 +65,7 @@
         android:id="@+id/textViewReason"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Reason:"/>
+        android:hint="Reason:"/>
 
     <EditText
         android:id="@+id/editTextReason"
@@ -53,9 +73,33 @@
         android:layout_height="wrap_content"
         android:hint="Enter reason"/>
 
-    <Button
-        android:id="@+id/buttonSaveFine"
+    <TextView
+        android:id="@+id/textViewAmount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Save Fine"/>
+        android:hint="Fine Amount (LKR):"/>
+
+    <EditText
+        android:id="@+id/fineAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Fine Amount"/>
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"/>
+
+    <Button
+        android:id="@+id/buttonSaveFine"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Add Fine"
+        android:background="@drawable/btn_custom"
+        android:fontFamily="@font/roboto_regular"
+        android:textColor="#FFFFFF"
+        android:drawableStart="@drawable/ic_add"
+        android:drawablePadding="8dp"
+        android:layout_marginTop="16dp"/>
 </LinearLayout>

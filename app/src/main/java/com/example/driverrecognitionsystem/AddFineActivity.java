@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
@@ -14,10 +15,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
 public class AddFineActivity extends AppCompatActivity {
 
-    private EditText editTextDriverUser, editTextAddedDate, editTextPoliceUser, editTextReason;
+    private EditText editTextDriverUser, editTextAddedDate, editTextPoliceUser, editTextReason, fineAmount, targetId, editTextVehicleNo;
+
+    private TextView status;
 
 
     @Override
@@ -29,6 +33,18 @@ public class AddFineActivity extends AppCompatActivity {
         editTextAddedDate = findViewById(R.id.editTextAddedDate);
         editTextPoliceUser = findViewById(R.id.editTextPoliceUser);
         editTextReason = findViewById(R.id.editTextReason);
+        status = findViewById(R.id.status);
+        fineAmount = findViewById(R.id.fineAmount);
+        targetId = findViewById(R.id.targetId);
+        editTextVehicleNo = findViewById(R.id.editTextVehicleNo);
+
+        status.setText("Incomplete");
+        status.setVisibility(View.GONE);
+
+        int randomId = generateRandomId();
+
+        targetId.setText(String.valueOf(randomId));
+        targetId.setVisibility(View.GONE);
 
         String userName = getIntent().getStringExtra("user");
         String driverName = getIntent().getStringExtra("driver");
@@ -50,21 +66,28 @@ public class AddFineActivity extends AppCompatActivity {
 
     }
 
+    private int generateRandomId() {
+        Random random = new Random();
+        return random.nextInt(10000);
+    }
+
     private void saveFineDetails() {
         String driverUser = editTextDriverUser.getText().toString();
         String addedDate = editTextAddedDate.getText().toString();
         String policeUser = editTextPoliceUser.getText().toString();
         String reason = editTextReason.getText().toString();
+        String statusF = status.getText().toString();
+        String amount = fineAmount.getText().toString();
+        String target = targetId.getText().toString();
+        String vehicle = editTextVehicleNo.getText().toString();
 
-        FineDetails fineDetails = new FineDetails();
-        fineDetails.setDriverUser(driverUser);
-        fineDetails.setAddedDate(addedDate);
-        fineDetails.setPoliceUser(policeUser);
-        fineDetails.setReason(reason);
+        FineDetails fineDetails = new FineDetails(target, driverUser, addedDate, policeUser, reason, statusF, amount, vehicle);
 
-        DatabaseReference fineReference = FirebaseDatabase.getInstance().getReference("Fine_Details");
-        fineReference.push().setValue(fineDetails);
+        DatabaseReference finesReference = FirebaseDatabase.getInstance().getReference("Fine_Details");
 
-        Toast.makeText(this, "Fine details saved successfully", Toast.LENGTH_SHORT).show();
+        String fineId = finesReference.push().getKey();
+        finesReference.child(fineId).setValue(fineDetails);
+
+        Toast.makeText(this, "Fine details saved successfully with ID: " + fineId, Toast.LENGTH_SHORT).show();
     }
 }

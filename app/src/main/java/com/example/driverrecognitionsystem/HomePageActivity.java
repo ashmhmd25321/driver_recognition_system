@@ -25,7 +25,7 @@ import com.google.firebase.storage.StorageReference;
 public class HomePageActivity extends AppCompatActivity {
 
     TextView welcome;
-    Button signOut, scanBtn, viewDetailsBtn;
+    Button signOut, scanBtn, viewDetailsBtn, fines;
 
     ImageView profileImage;
     FirebaseAuth firebaseAuth;
@@ -44,6 +44,7 @@ public class HomePageActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         profileImage = findViewById(R.id.profileImage);
         firebaseStorage = FirebaseStorage.getInstance();
+        fines = findViewById(R.id.fines);
 
         String userName = getIntent().getStringExtra("userName");
         String email = getIntent().getStringExtra("userEmail");
@@ -51,6 +52,12 @@ public class HomePageActivity extends AppCompatActivity {
         welcome.setText(userName);
 
         loadProfileImage(userName);
+
+        fines.setOnClickListener(view -> {
+            Intent intent = new Intent(HomePageActivity.this, ViewFinesActivity.class);
+            intent.putExtra("user", userName);
+            startActivity(intent);
+        });
 
         signOut.setOnClickListener(new View.OnClickListener() {
             @Override
