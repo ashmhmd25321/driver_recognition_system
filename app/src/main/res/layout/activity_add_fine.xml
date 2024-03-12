@@ -1,0 +1,61 @@
+<!-- res/layout/fine_details_layout.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textViewDriverUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Driver User:"/>
+
+    <EditText
+        android:id="@+id/editTextDriverUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter driver user"/>
+
+    <TextView
+        android:id="@+id/textViewAddedDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Added Date:"/>
+
+    <EditText
+        android:id="@+id/editTextAddedDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter added date"/>
+
+    <TextView
+        android:id="@+id/textViewPoliceUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Police User:"/>
+
+    <EditText
+        android:id="@+id/editTextPoliceUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter police user"/>
+
+    <TextView
+        android:id="@+id/textViewReason"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reason:"/>
+
+    <EditText
+        android:id="@+id/editTextReason"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter reason"/>
+
+    <Button
+        android:id="@+id/buttonSaveFine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save Fine"/>
+</LinearLayout>

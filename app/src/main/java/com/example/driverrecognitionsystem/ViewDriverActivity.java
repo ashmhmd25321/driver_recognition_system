@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 
 public class ViewDriverActivity extends AppCompatActivity {
 
-    Button scanner, search, faceRecognition;
+    Button scanner, search, faceRecognition, addFine;
     EditText text;
 
     TextView driverDetails, username;
@@ -48,6 +48,7 @@ public class ViewDriverActivity extends AppCompatActivity {
         search = findViewById(R.id.search);
         driverDetails = findViewById(R.id.licenceDetails);
         faceRecognition = findViewById(R.id.faceRecognition);
+        addFine = findViewById(R.id.addFine);
 
         String userName = getIntent().getStringExtra("user");
 
@@ -66,6 +67,17 @@ public class ViewDriverActivity extends AppCompatActivity {
             Intent intent = new Intent(ViewDriverActivity.this, FaceRecognitionActivity.class);
             intent.putExtra("driver", text.getText().toString());
             startActivity(intent);
+        });
+
+        addFine.setOnClickListener(view -> {
+            if (!text.getText().toString().equals("")) {
+                Intent intent = new Intent(ViewDriverActivity.this, AddFineActivity.class);
+                intent.putExtra("driver", text.getText().toString());
+                intent.putExtra("user", userName);
+                startActivity(intent);
+            } else {
+                Toast.makeText(ViewDriverActivity.this, "Enter Driver ID", Toast.LENGTH_SHORT).show();
+            }
         });
 
 

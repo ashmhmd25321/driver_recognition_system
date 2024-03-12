@@ -18,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".AddFineActivity"
+            android:exported="false" />
+        <activity
             android:name=".FaceRecognitionActivity"
             android:exported="false" />
         <activity
