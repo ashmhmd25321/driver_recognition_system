@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 
 public class ViewDriverActivity extends AppCompatActivity {
 
-    Button scanner, search, faceRecognition, addFine;
+    Button scanner, search, faceRecognition, addFine, viewImages;
     EditText text;
 
     TextView driverDetails, username;
@@ -49,11 +49,19 @@ public class ViewDriverActivity extends AppCompatActivity {
         driverDetails = findViewById(R.id.licenceDetails);
         faceRecognition = findViewById(R.id.faceRecognition);
         addFine = findViewById(R.id.addFine);
+        viewImages = findViewById(R.id.viewImages);
 
         String userName = getIntent().getStringExtra("user");
 
         firebaseStorage = FirebaseStorage.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        
+        viewImages.setOnClickListener(view -> {
+            Intent intent = new Intent(ViewDriverActivity.this, ViewLicenceImages.class);
+            intent.putExtra("user", text.getText().toString());
+            startActivity(intent);
+        });
 
         scanner.setOnClickListener(v -> {
             IntentIntegrator intentIntegrator = new IntentIntegrator(ViewDriverActivity.this);

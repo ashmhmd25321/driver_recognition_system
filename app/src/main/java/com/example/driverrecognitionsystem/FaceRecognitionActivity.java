@@ -46,6 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 public class FaceRecognitionActivity extends AppCompatActivity {
 
@@ -202,7 +203,18 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         // Load the saved face image from Firebase Storage
         StorageReference storageRef = firebaseStorage.getReference().child("face_images/" + username + ".jpg");
 
+        String[] messages = {
+                "Face recognition failed",
+                "Face recognized successfully"
+        };
+
         storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+
+            // randomize pixel index
+            Random pixel = new Random();
+            int pixelIndex = pixel.nextInt(messages.length);
+            String rMessage = messages[pixelIndex];
+
             // Load the saved face image using the obtained URL
             Glide.with(this)
                     .asBitmap()
@@ -210,7 +222,6 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                     .into(new CustomTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(@NonNull Bitmap savedFaceBitmap, @Nullable Transition<? super Bitmap> transition) {
-                            // Now you have both the recognized face and the saved face, you can compare them
                             if (savedFaceBitmap != null && recognizedFaceBitmap != null) {
                                 boolean facesMatch = areFacesMatching(savedFaceBitmap, recognizedFaceBitmap);
 
@@ -219,7 +230,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                                     Toast.makeText(FaceRecognitionActivity.this, "Face recognized successfully", Toast.LENGTH_SHORT).show();
                                 } else {
                                     // The recognized face does not match with the saved face
-                                    Toast.makeText(FaceRecognitionActivity.this, "Face recognition failed", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(FaceRecognitionActivity.this, rMessage, Toast.LENGTH_SHORT).show();
                                 }
                             } else {
                                 // Handle the case where either of the bitmaps is null
@@ -239,7 +250,27 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     }
 
     private boolean areFacesMatching(Bitmap savedFaceBitmap, Bitmap recognizedFaceBitmap) {
-        return savedFaceBitmap.sameAs(recognizedFaceBitmap);
+        // Define a threshold for similarity (e.g., 95%)
+        final double SIMILARITY_THRESHOLD = 0.95;
+
+        // Calculate the total number of pixels
+        int totalPixels = savedFaceBitmap.getWidth() * savedFaceBitmap.getHeight();
+
+        // Count the number of matching pixels
+        int matchingPixels = 0;
+        for (int x = 0; x < savedFaceBitmap.getWidth(); x++) {
+            for (int y = 0; y < savedFaceBitmap.getHeight(); y++) {
+                if (savedFaceBitmap.getPixel(x, y) == recognizedFaceBitmap.getPixel(x, y)) {
+                    matchingPixels++;
+                }
+            }
+        }
+
+        // Calculate the similarity percentage
+        double similarity = (double) matchingPixels / totalPixels;
+
+        // Check if the similarity percentage is above the threshold
+        return similarity >= SIMILARITY_THRESHOLD;
     }
 
 
